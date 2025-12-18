@@ -44,14 +44,18 @@ public class ExpenseServiceImpl implements ExpenseService {
     @Override
     public ExpenseResponseDto getExpenseById(Long id) {
         Expense expense = expenseRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Expense not found with id " + id));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Expense not found with id " + id)
+                );
         return mapToResponse(expense);
     }
 
     @Override
     public ExpenseResponseDto updateExpense(Long id, ExpenseRequestDto requestDto) {
         Expense expense = expenseRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Expense not found with id " + id));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Expense not found with id " + id)
+                );
 
         expense.setTitle(requestDto.getTitle());
         expense.setCategory(requestDto.getCategory());
@@ -66,9 +70,7 @@ public class ExpenseServiceImpl implements ExpenseService {
     @Override
     public void deleteExpense(Long id) {
         if (!expenseRepository.existsById(id)) {
-            throw new ResourceNotFoundException(
-                    "Expense not found with id " + id
-            );
+            throw new ResourceNotFoundException("Expense not found with id " + id);
         }
         expenseRepository.deleteById(id);
     }
