@@ -1,9 +1,8 @@
 package com.expense.expenseapp.model.model.base;
 import jakarta.persistence.*;
-import io.swagger.v3.oas.annotations.Hidden;
 
 import java.time.LocalDateTime;
-@Hidden
+
 @MappedSuperclass
 public abstract class BaseEntity {
 
@@ -34,7 +33,6 @@ public abstract class BaseEntity {
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
-
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
