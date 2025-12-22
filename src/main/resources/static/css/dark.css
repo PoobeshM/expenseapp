@@ -1,0 +1,14 @@
+body.dark {
+    background-color: #121212;
+    color: #e0e0e0;
+}
+
+body.dark .card,
+body.dark .table {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+}
+
+body.dark .table-dark {
+    background-color: #333;
+}

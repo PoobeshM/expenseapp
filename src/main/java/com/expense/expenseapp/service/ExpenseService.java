@@ -2,18 +2,19 @@ package com.expense.expenseapp.service;
 
 import com.expense.expenseapp.dto.ExpenseRequestDto;
 import com.expense.expenseapp.dto.ExpenseResponseDto;
+import com.expense.expenseapp.model.User;
 
 import java.util.List;
 
 public interface ExpenseService {
 
-    ExpenseResponseDto createExpense(ExpenseRequestDto requestDto);
+    ExpenseResponseDto createExpense(ExpenseRequestDto dto, User user);
 
-    List<ExpenseResponseDto> getAllExpenses();
+    List<ExpenseResponseDto> getAllExpenses(User user);
 
-    ExpenseResponseDto getExpenseById(Long id);
+    ExpenseResponseDto getExpenseById(Long id, User user);
 
-    ExpenseResponseDto updateExpense(Long id, ExpenseRequestDto requestDto);
+    ExpenseResponseDto updateExpense(Long id, ExpenseRequestDto dto, User user);
 
-    void deleteExpense(Long id);
+    void deleteExpense(Long id, User user);
 }

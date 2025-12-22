@@ -1,58 +1,94 @@
 package com.expense.expenseapp.controller;
+
 import com.expense.expenseapp.dto.ExpenseRequestDto;
 import com.expense.expenseapp.dto.ExpenseResponseDto;
+import com.expense.expenseapp.model.User;
 import com.expense.expenseapp.service.ExpenseService;
-import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/expenses")
+@CrossOrigin
 public class ExpenseController {
 
     private final ExpenseService expenseService;
+    private final HttpSession session;
 
-    public ExpenseController(ExpenseService expenseService) {
+    public ExpenseController(ExpenseService expenseService,
+                             HttpSession session) {
         this.expenseService = expenseService;
+        this.session = session;
     }
 
-    // CREATE
+    // ✅ CREATE EXPENSE
     @PostMapping
-    public ResponseEntity<ExpenseResponseDto> createExpense(
-            @Valid @RequestBody ExpenseRequestDto requestDto) {
+    public ExpenseResponseDto createExpense(
+            @RequestBody ExpenseRequestDto dto) {
 
-        ExpenseResponseDto response = expenseService.createExpense(requestDto);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        User user = (User) session.getAttribute("LOGGED_USER");
+
+        if (user == null) {
+            throw new RuntimeException("User not logged in");
+        }
+
+        return expenseService.createExpense(dto, user);
     }
 
-    // READ ALL
+    // ✅ GET ALL EXPENSES
     @GetMapping
-    public ResponseEntity<List<ExpenseResponseDto>> getAllExpenses() {
-        return ResponseEntity.ok(expenseService.getAllExpenses());
+    public List<ExpenseResponseDto> getAllExpenses() {
+
+        User user = (User) session.getAttribute("LOGGED_USER");
+
+        if (user == null) {
+            throw new RuntimeException("User not logged in");
+        }
+
+        return expenseService.getAllExpenses(user);
     }
 
-    // READ BY ID
+    // ✅ GET EXPENSE BY ID
     @GetMapping("/{id}")
-    public ResponseEntity<ExpenseResponseDto> getExpenseById(@PathVariable Long id) {
-        return ResponseEntity.ok(expenseService.getExpenseById(id));
+    public ExpenseResponseDto getExpenseById(@PathVariable Long id) {
+
+        User user = (User) session.getAttribute("LOGGED_USER");
+
+        if (user == null) {
+            throw new RuntimeException("User not logged in");
+        }
+
+        return expenseService.getExpenseById(id, user);
     }
 
-    // UPDATE
+    // ✅ UPDATE EXPENSE
     @PutMapping("/{id}")
-    public ResponseEntity<ExpenseResponseDto> updateExpense(
+    public ExpenseResponseDto updateExpense(
             @PathVariable Long id,
-            @Valid @RequestBody ExpenseRequestDto requestDto) {
+            @RequestBody ExpenseRequestDto dto) {
 
-        return ResponseEntity.ok(expenseService.updateExpense(id, requestDto));
+        User user = (User) session.getAttribute("LOGGED_USER");
+
+        if (user == null) {
+            throw new RuntimeException("User not logged in");
+        }
+
+        return expenseService.updateExpense(id, dto, user);
     }
 
-    // DELETE
+    // ✅ DELETE EXPENSE
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteExpense(@PathVariable Long id) {
-        expenseService.deleteExpense(id);
-        return ResponseEntity.noContent().build();
+    public String deleteExpense(@PathVariable Long id) {
+
+        User user = (User) session.getAttribute("LOGGED_USER");
+
+        if (user == null) {
+            throw new RuntimeException("User not logged in");
+        }
+
+        expenseService.deleteExpense(id, user);
+        return "Expense deleted successfully";
     }
 }

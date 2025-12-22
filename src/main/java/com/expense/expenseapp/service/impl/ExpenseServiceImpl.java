@@ -4,6 +4,7 @@ import com.expense.expenseapp.dto.ExpenseRequestDto;
 import com.expense.expenseapp.dto.ExpenseResponseDto;
 import com.expense.expenseapp.exception.ResourceNotFoundException;
 import com.expense.expenseapp.model.Expense;
+import com.expense.expenseapp.model.User;
 import com.expense.expenseapp.repository.ExpenseRepository;
 import com.expense.expenseapp.service.ExpenseService;
 import org.springframework.stereotype.Service;
@@ -21,69 +22,100 @@ public class ExpenseServiceImpl implements ExpenseService {
     }
 
     @Override
-    public ExpenseResponseDto createExpense(ExpenseRequestDto requestDto) {
-        Expense expense = new Expense();
-        expense.setTitle(requestDto.getTitle());
-        expense.setCategory(requestDto.getCategory());
-        expense.setAmount(requestDto.getAmount());
-        expense.setPaymentMode(requestDto.getPaymentMode());
-        expense.setNotes(requestDto.getNotes());
+    public ExpenseResponseDto createExpense(ExpenseRequestDto dto, User user) {
 
-        Expense savedExpense = expenseRepository.save(expense);
-        return mapToResponse(savedExpense);
+        Expense expense = new Expense();
+        expense.setTitle(dto.getTitle());
+        expense.setCategory(dto.getCategory());
+        expense.setAmount(dto.getAmount());
+        expense.setPaymentMode(dto.getPaymentMode());
+        expense.setNotes(dto.getNotes());
+        expense.setUser(user);
+
+        Expense saved = expenseRepository.save(expense);
+        return mapToResponse(saved);
     }
 
     @Override
-    public List<ExpenseResponseDto> getAllExpenses() {
-        return expenseRepository.findAll()
-                .stream()
+    public List<ExpenseResponseDto> getAllExpenses(User user) {
+
+        List<Expense> expenses;
+
+        if ("ADMIN".equals(user.getRole())) {
+            expenses = expenseRepository.findAll();
+        } else {
+            expenses = expenseRepository.findByUser(user);
+        }
+
+        return expenses.stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public ExpenseResponseDto getExpenseById(Long id) {
+    public ExpenseResponseDto getExpenseById(Long id, User user) {
+
         Expense expense = expenseRepository.findById(id)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Expense not found with id " + id)
-                );
+                        new ResourceNotFoundException("Expense not found"));
+
+        if (!user.getRole().equals("ADMIN")
+                && !expense.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Unauthorized access");
+        }
+
         return mapToResponse(expense);
     }
 
     @Override
-    public ExpenseResponseDto updateExpense(Long id, ExpenseRequestDto requestDto) {
+    public ExpenseResponseDto updateExpense(Long id,
+                                           ExpenseRequestDto dto,
+                                           User user) {
+
         Expense expense = expenseRepository.findById(id)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Expense not found with id " + id)
-                );
+                        new ResourceNotFoundException("Expense not found"));
 
-        expense.setTitle(requestDto.getTitle());
-        expense.setCategory(requestDto.getCategory());
-        expense.setAmount(requestDto.getAmount());
-        expense.setPaymentMode(requestDto.getPaymentMode());
-        expense.setNotes(requestDto.getNotes());
+        if (!user.getRole().equals("ADMIN")
+                && !expense.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Unauthorized access");
+        }
 
-        Expense updatedExpense = expenseRepository.save(expense);
-        return mapToResponse(updatedExpense);
+        expense.setTitle(dto.getTitle());
+        expense.setCategory(dto.getCategory());
+        expense.setAmount(dto.getAmount());
+        expense.setPaymentMode(dto.getPaymentMode());
+        expense.setNotes(dto.getNotes());
+
+        return mapToResponse(expenseRepository.save(expense));
     }
 
     @Override
-    public void deleteExpense(Long id) {
-        if (!expenseRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Expense not found with id " + id);
+    public void deleteExpense(Long id, User user) {
+
+        Expense expense = expenseRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Expense not found"));
+
+        if (!user.getRole().equals("ADMIN")
+                && !expense.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Unauthorized access");
         }
-        expenseRepository.deleteById(id);
+
+        expenseRepository.delete(expense);
     }
 
-    private ExpenseResponseDto mapToResponse(Expense expense) {
+    private ExpenseResponseDto mapToResponse(Expense e) {
+
         ExpenseResponseDto dto = new ExpenseResponseDto();
-        dto.setId(expense.getId());
-        dto.setTitle(expense.getTitle());
-        dto.setCategory(expense.getCategory());
-        dto.setAmount(expense.getAmount());
-        dto.setPaymentMode(expense.getPaymentMode());
-        dto.setNotes(expense.getNotes());
-        dto.setCreatedAt(expense.getCreatedAt());
+        dto.setId(e.getId());
+        dto.setTitle(e.getTitle());
+        dto.setCategory(e.getCategory());
+        dto.setAmount(e.getAmount());
+        dto.setPaymentMode(e.getPaymentMode());
+        dto.setNotes(e.getNotes());
+        dto.setCreatedAt(e.getCreatedAt());
+
         return dto;
     }
 }

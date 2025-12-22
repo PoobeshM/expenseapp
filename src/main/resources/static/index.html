@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Expense Tracker</title>
+<link rel="stylesheet" href="/css/dark.css">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<button class="btn btn-outline-secondary btn-sm" onclick="toggleDarkMode()">
+    🌙
+</button>
+
+<body class="bg-light">
+
+<div class="container mt-4">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>💰 Expense Tracker</h3>
+        <button class="btn btn-danger btn-sm" onclick="logout()">Logout</button>
+    </div>
+
+    <!-- Add / Edit Expense -->
+    <div class="card p-3 mb-3">
+        <h5>Add / Edit Expense</h5>
+
+        <div class="row">
+            <div class="col-md-4 mb-2">
+                <input id="title" class="form-control" placeholder="Title">
+            </div>
+            <div class="col-md-4 mb-2">
+                <select id="category" class="form-select">
+                    <option value="">Select Category</option>
+                    <option>Food</option>
+                    <option>Travel</option>
+                    <option>Bills</option>
+                </select>
+            </div>
+            <div class="col-md-4 mb-2">
+                <input id="amount" type="number" class="form-control" placeholder="Amount">
+            </div>
+            <div class="col-md-4 mb-2">
+                <input id="paymentMode" class="form-control" placeholder="Payment Mode">
+            </div>
+            <div class="col-md-8 mb-2">
+                <input id="notes" class="form-control" placeholder="Notes">
+            </div>
+        </div>
+
+        <button class="btn btn-primary mt-2" onclick="addExpense()">Save Expense</button>
+    </div>
+
+    <!-- Filters -->
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <select id="filterCategory" class="form-select" onchange="filterExpenses()">
+                <option value="">All Categories</option>
+                <option>Food</option>
+                <option>Travel</option>
+                <option>Bills</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <input type="date" id="fromDate" class="form-control">
+        </div>
+        <div class="col-md-3">
+            <input type="date" id="toDate" class="form-control">
+        </div>
+        <div class="col-md-3">
+            <button class="btn btn-secondary w-100" onclick="filterByDate()">Filter by Date</button>
+        </div>
+    </div>
+
+    <!-- Totals -->
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <div class="alert alert-success">
+                Total Expense: ₹<span id="totalAmount">0</span>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="alert alert-info">
+                This Month: ₹<span id="monthlyTotal">0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <table class="table table-bordered bg-white">
+        <thead class="table-dark">
+            <tr>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Payment</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="expenseTable"></tbody>
+    </table>
+
+    <!-- Export -->
+    <button class="btn btn-success mb-4" onclick="exportExcel()">Export to Excel</button>
+<button class="btn btn-danger btn-sm" onclick="logout()">Logout</button>
+
+    <!-- Charts -->
+    <div class="row">
+        <div class="col-md-6">
+            <canvas id="categoryChart"></canvas>
+        </div>
+        <div class="col-md-6">
+            <canvas id="barChart"></canvas>
+        </div>
+    </div>
+
+</div>
+
+<script src="/js/app.js"></script>
+</body>
+</html>
