@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface ExpenseService {
 
+
     ExpenseResponseDto createExpense(ExpenseRequestDto dto, User user);
 
     List<ExpenseResponseDto> getAllExpenses(User user);

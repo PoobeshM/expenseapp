@@ -2,6 +2,8 @@ package com.expense.expenseapp.model;
 
 import jakarta.persistence.*;
 
+
+
 @Entity
 @Table(name = "users")
 public class User {

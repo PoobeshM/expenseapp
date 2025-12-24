@@ -1,28 +1,27 @@
 function login() {
-    const data = {
-        username: document.getElementById("username").value,
-        password: document.getElementById("password").value
-    };
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
 
-    fetch("/api/auth/login", {
+    fetch("http://localhost:8080/api/auth/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
+        headers: {
+            "Content-Type": "application/json"
+        },
+        credentials: "include",
+        body: JSON.stringify({
+            username: username,
+            password: password
+        })
     })
     .then(res => {
-        if (!res.ok) {
-            document.getElementById("errorBox").classList.remove("d-none");
-            throw new Error("Login failed");
-        }
+        if (!res.ok) throw new Error("Login failed");
         return res.text();
     })
     .then(() => {
-        // After successful login, get user details
-        return fetch("/api/auth/me");
+        return fetch("/api/auth/me", { credentials: "include" });
     })
     .then(res => res.json())
     .then(user => {
-        // Role-based redirect
         if (user.role === "ADMIN") {
             window.location.href = "admin.html";
         } else {
@@ -30,11 +29,14 @@ function login() {
         }
     })
     .catch(() => {
-        // error already shown in UI
+        document.getElementById("errorBox").classList.remove("d-none");
     });
 }
+
+
 function logout() {
     fetch("/api/auth/logout", { method: "POST" })
         .then(() => window.location.href = "login.html");
 }
+
 

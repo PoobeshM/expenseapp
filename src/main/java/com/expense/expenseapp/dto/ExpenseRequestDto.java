@@ -1,8 +1,12 @@
 package com.expense.expenseapp.dto;
+import java.time.LocalDateTime;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 public class ExpenseRequestDto {
+    private LocalDateTime createdAt;
+
     @NotBlank
     private String title;
     @NotBlank
